@@ -2,98 +2,7 @@ use std::collections::HashMap;
 
 use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 
-#[derive(Debug, Copy, Clone)]
-pub enum Device {
-    Fan,
-    AC,
-    Heater,
-    ExteriorLight,
-    KitchenLight,
-    BedroomLight,
-    InteriorFan,
-}
-
-impl Device {
-    pub fn from_instruction(s: &str) -> Option<(&str, Self)> {
-        use Device::*;
-        let device_set: HashMap<&str, Device> = HashMap::from([
-            ("fan", Fan),
-            ("ac", AC),
-            ("heater", Heater),
-            ("exterior light", ExteriorLight),
-            ("kitchen light", KitchenLight),
-            ("bedroom light", BedroomLight),
-            ("interior fan", InteriorFan),
-        ]);
-
-        for (key, &value) in device_set.iter() {
-            if s.starts_with(key) {
-                return Some((key, value))
-            }
-        }
-
-        None
-
-        // (instruction, None)
-        // use Device::*;
-        // match s.as_str() {
-        //     "exterior fan" => Some(ExteriorFan),
-        //     "ac" => Some(AC),
-        //     "heater" => Some(Heater),
-        //     "exterior light" => Some(ExteriorLight),
-        //     "kitchen light" => Some(KitchenLight),
-        //     "bedroom light" => Some(BedroomLight),
-        //     "interior fan" => Some(InteriorFan),
-        //     _ => None,
-        // }
-    }
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Action {
-    On,
-    Off,
-    Up,
-    Down,
-    Min,
-    Max,
-    Set,
-    NoAction,
-}
-
-impl Action {
-    pub fn from_instruction(s: &str) -> Option<(&str, Self)> {
-        use Action::*;
-        let action_set: HashMap<&str, Action> = HashMap::from([
-            ("on", On),
-            ("off", Off),
-            ("up", Up),
-            ("down", Down),
-            ("min", Min),
-            ("max", Max),
-            ("set", Set),
-        ]);
-
-        for (key, &value) in action_set.iter() {
-            if s.starts_with(key) {
-                return Some((key, value))
-            }
-        }
-
-        None
-//         use Action::*;
-//         match s {
-//             "exterior fan" => Some(On),
-//             "ac" => Some(Off),
-//             "heater" => Some(Up),
-//             "exterior light" => Some(Down),
-//             "kitchen light" => Some(Min),
-//             "bedroom light" => Some(Max),
-//             "interior fan" => Some(Set),
-//             _ => None,
-//         }
-    }
-}
+use instructions::{Device, Action};
 
 async fn index(req: HttpRequest) -> &'static str {
     println!("REQ: {req:?}");
@@ -101,14 +10,14 @@ async fn index(req: HttpRequest) -> &'static str {
 }
 
 async fn instruction(_req: HttpRequest, info: web::Query<HashMap<String, String>>) -> HttpResponse {
-    // println!("REQ: {:?}", req);
+//    println!("REQ: {:?}", _req);
     let instruction = info.iter().next();
 
     if instruction.is_none() { return HttpResponse::Ok().body("Oops, we didn't get that.") }
 
     let instruction = instruction.unwrap().1.clone();
 
-    let device = Device::from_instruction(&instruction);
+    let device = Device::from_instruction_str(&instruction);
 
     let (device_name, device) = match device {
         Some((n, d)) => (n, d),
@@ -117,7 +26,7 @@ async fn instruction(_req: HttpRequest, info: web::Query<HashMap<String, String>
 
     let action_plus = instruction.chars().skip(device_name.len() + 1).collect::<String>();
 
-    let action = Action::from_instruction(&action_plus);
+    let action = Action::from_instruction_str(&action_plus);
 
     let (action_name, action) = match action {
         Some((s, a)) => (s, a),

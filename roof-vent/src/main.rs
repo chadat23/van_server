@@ -56,11 +56,21 @@ fn main(){
                 response.write_all(html.as_bytes())?;
                 Ok(())
             }).unwrap();
+    server.fn_handler("/device", Method::Get, |request| {
+                let html = device();
+                let mut response = request.into_ok_response()?;
+                response.write_all(html.as_bytes())?;
+                Ok(())
+            }).unwrap();
     loop{
         println!("IP info: {:?}", wifi_driver.sta_netif().get_ip_info().unwrap());
         sleep(Duration::new(10,0));
     }
 
+}
+
+fn device() -> String {
+    String::from("roof vent")
 }
 
 fn index_html() -> String {
