@@ -16,6 +16,12 @@ async fn main() {
     // }
 
     let devices = get_devices().await;
+
+    println!("Devices!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    for (d, s) in devices.iter() {
+        println!("    Device: {}, IP: {}", (*d).to_str(), s);
+    }
+
 }
 
 async fn get_devices() -> HashMap<Device, String> {
@@ -41,12 +47,12 @@ async fn get_devices() -> HashMap<Device, String> {
 }
 
 async fn get_device(ip: String) -> Option<(Device, String)> {
-    let url = format!("http://{}/devices", ip);
+    let url = format!("http://{}/device", ip);
     dbg!(&url);
     let body = match reqwest::get(&url).await {
         Ok(response) => match response.text().await {
             Ok(text) => {
-                println!("{}\n{}\n", &url, &text);
+                println!("--------------------------- Returned thing: {}\n{}\n", &url, &text);
                 text
             },
             Err(_) => return None,
@@ -55,7 +61,7 @@ async fn get_device(ip: String) -> Option<(Device, String)> {
     };
     dbg!(&body);
 
-    Some((Device::Fan, ip))
+    Some((Device::RoofVent, ip))
 }
 
 fn run_nmap() -> String {

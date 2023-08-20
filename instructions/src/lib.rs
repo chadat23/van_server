@@ -21,7 +21,7 @@ const ACTIONS: [(Action, &'static str); 7] = [
     (Action::Set, "set"),
 ];
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Device {
     RoofVent,
     AC,
@@ -56,7 +56,7 @@ impl Device {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Action {
     On,
     Off,
