@@ -19,6 +19,7 @@ use esp_idf_svc::{
 };
 use embedded_svc::wifi::{ClientConfiguration, Wifi, Configuration};
 use esp_idf_svc::http::server::Configuration as SVC_Configuration;
+use instructions::{Device, Action};
 
 fn main(){
     esp_idf_sys::link_patches();//Needed for esp32-rs
@@ -57,7 +58,7 @@ fn main(){
                 Ok(())
             }).unwrap();
     server.fn_handler("/device", Method::Get, |request| {
-                let html = device();
+                let html = Device::RoofVent.to_str();
                 let mut response = request.into_ok_response()?;
                 response.write_all(html.as_bytes())?;
                 Ok(())
@@ -67,10 +68,6 @@ fn main(){
         sleep(Duration::new(10,0));
     }
 
-}
-
-fn device() -> String {
-    String::from("roof vent")
 }
 
 fn index_html() -> String {
